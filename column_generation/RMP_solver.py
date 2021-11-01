@@ -8,7 +8,6 @@ def solve_rmp(policy_costs,
               enforce_additionals: List[Tuple[bool, float]],
               last_v=None,
               last_cvar=None,
-              last_best=None,
               last_worst=None,
               cost_bounds=[None],
               wellbeing_cost_index=0,
@@ -24,8 +23,6 @@ def solve_rmp(policy_costs,
                         (rows are policies, columns are cost functions)
         last_v: Expected cost of the stochastic policy as of the last iteration
         last_cvar: The conditional value-at-risk (confidence 1-alpha) as of the last iteration
-        last_best: The absolute difference between highest and lowest expected cost of deterministic policies in
-                    last iteration's stochastic policy with non-zero probability
         last_worst: Highest expected cost of a deterministic policy in last iteration's stochastic policy
                     with non-zero probability
         cost_bounds: The C-SSP upper bounds on secondary costs (primary cost is to be included in the list at index 0,
@@ -66,14 +63,30 @@ def solve_rmp(policy_costs,
         m.addConstr(probabilities @ sorted_costs[:, j] <= cost_bounds[j])
 
     # Minimizing expected primary cost
-    obj = probabilities @ sorted_costs[:, 0]
+    obj = m.addVar(name="obj", lb=min_cost, ub=max_cost)
+    m.addConstr(probabilities @ sorted_costs[:, 0] == obj)
     m.setObjective(obj, GRB.MINIMIZE)
 
     if enforce_additionals[0][0] or enforce_additionals[1][0] or enforce_additionals[2][0] or enforce_additionals[3][0]:
-        nonzero_probabilities = m.addVars(range(num_policies), name="nz_prob", vtype=GRB.BINARY)
+        active_policy_epsilon = 0.0001
+        prob_nonzero = m.addVars(range(num_policies), name="prob_nonzero", vtype=GRB.BINARY)
+        activated_costs = m.addVars(range(num_policies), name="activated_costs", vtype=GRB.CONTINUOUS, lb=0, ub=max_cost)
         for i in range(num_policies):
-            m.addConstr(nonzero_probabilities[i] >= probabilities[i])
+            m.addConstr(prob_nonzero[i] == 1 >> probabilities[i] >= active_policy_epsilon)
+            m.addConstr(prob_nonzero[i] == 0 >> probabilities[i] < active_policy_epsilon)
+            m.addConstr(activated_costs[i] == prob_nonzero[i] * sorted_costs[i, 0])
 
+        worst = m.addVar(name="worst_activated", lb=0, ub=max_cost)
+        m.addConstr(worst=gp.max_(activated_costs))
+
+        if enforce_additionals[0][0]:
+            m.addConstr(worst <= enforce_additionals[0][1])
+        if enforce_additionals[1][0]:
+            m.addConstr(last_v - obj >= enforce_additionals[1][1] * (worst - last_worst))
+        if enforce_additionals[2][0]:
+            m.addConstr(worst - obj <= enforce_additionals[2][1])
+        if enforce_additionals[3][0]:
+            m.addConstr(last_v - obj >= enforce_additionals[3][1] * ((worst - obj) - (last_worst - last_v)))
 
     # Optionally adding CVaR based constraints
     if enforce_additionals[4][0] or enforce_additionals[5][0]:
@@ -115,10 +128,8 @@ def solve_rmp(policy_costs,
 
         if enforce_additionals[4][0]:
             m.addConstr(conditional_value_at_risk <= enforce_additionals[4][1])
-        else:
-            a = enforce_additionals[5][1]
-            m.addConstr(last_v - probabilities @ sorted_costs[:, wellbeing_cost_index] >= a * (conditional_value_at_risk - last_cvar))
-
+        if enforce_additionals[5][0]:
+            m.addConstr(last_v - obj >= enforce_additionals[5][1] * (conditional_value_at_risk - last_cvar))
 
 
 if __name__ == "__main__":
