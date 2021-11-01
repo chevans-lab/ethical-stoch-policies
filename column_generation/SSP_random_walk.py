@@ -23,6 +23,7 @@ def random_walk(env: EthicalCsspEnv, n_policies: int):
                 flow[s.id][a.name] += in_flow
             else:
                 flow[s.id] = {}
+                policy[s.id] = {}
                 applicable_actions = env.applicable_actions(s)
                 for action in env.applicable_actions(s):
                     policy[s.id][action.name] = 0
@@ -42,15 +43,15 @@ def random_walk(env: EthicalCsspEnv, n_policies: int):
                 if a.name not in flow[s.id]:
                     flow[s.id][a.name] = 0
 
-        costs = np.array(flow[s.id][a.name] * np.array(env.transition_costs(s, a))
-                         for s in env.state_space for a in env.applicable_actions(s) if s.id in flow)
+        costs = np.array([flow[s.id][a.name] * np.array(env.transition_costs(s, a))
+                         for s in env.state_space for a in env.applicable_actions(s) if s.id in flow])
         summated_costs = np.sum(costs, axis=0)
 
         policies.append(policy)
         cost_vectors.append(summated_costs)
         n_policies -= 1
 
-    return np.array(cost_vectors), policies
+    return np.array(cost_vectors), np.array(policies)
 
 
 

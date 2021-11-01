@@ -3,9 +3,9 @@ import numpy as np
 
 
 class ColumnGenCSSPSolution:
-    probabilities: List[float]
+    probabilities: np.ndarray
     costs: np.ndarray
-    policies: List[Dict[int, Dict[str, float]]]
+    policies: np.ndarray
     value: float
     worst_case_value: float
     cvar: float

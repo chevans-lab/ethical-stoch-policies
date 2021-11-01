@@ -127,9 +127,9 @@ def optimal_deterministic_policy(env: EthicalCsspEnv,
 
     aggregate_costs = np.array([c.x for c in aggregate_costs])
 
-    return ColumnGenCSSPSolution(probabilities=[1.0],
+    return ColumnGenCSSPSolution(probabilities=np.array([1.0]),
                                  costs=np.array([aggregate_costs]),
-                                 policies=[return_policy],
+                                 policies=np.array([return_policy]),
                                  value=aggregate_costs[0],
                                  worst_case_value=aggregate_costs[0],
                                  cvar=aggregate_costs[0])
