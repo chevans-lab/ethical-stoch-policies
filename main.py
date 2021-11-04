@@ -2,11 +2,12 @@ from doctor_env import DoctorEnv, DoctorState, DoctorAction, DoctorActionName
 import doctor_env
 from itertools import chain, product, combinations
 from skdecide import DiscreteDistribution
-import solver
-import gurobi_solver
 from matplotlib import pyplot as plt
-from column_generation.det_SSP_solver import optimal_deterministic_policy
 from column_generation.CG_main import solve_cssp
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import seaborn.timeseries
 
 
 
@@ -34,30 +35,50 @@ def main():
                                 len(secondary_cost_bounds),
                                 wellbeing_costs)
 
-    policy, flow = solver.find_policy(doctor_instance, enforce_secondaries=True, enforce_ethical=False)
+    solution_iterations = 200
+    inner_iterations = 100
+    iteration_index = np.arange(solution_iterations * inner_iterations) % inner_iterations
+    iterations_values = np.empty(0)
+    worst_values = np.empty(0)
+    cvar_values = np.empty(0)
 
-    print("Policy computed")
-    for action, prob in policy[initial_state].get_values():
-        print(action.name, prob)
+    for i in range(solution_iterations):
+        solution, plot_data = solve_cssp(doctor_instance, n_iterations=inner_iterations)
+        iterations_values = np.concatenate((iterations_values, plot_data["Value"]))
+        if "Worst" in plot_data:
+            worst_values = np.concatenate((worst_values, plot_data["Worst"]))
+        if "CVaR" in plot_data:
+            cvar_values = np.concatenate((cvar_values, plot_data["CVaR"]))
+        print(solution.costs)
+        print(solution.policies)
+        print(solution.probabilities)
 
-    instantiations = []
-    pains = []
-    costs = []
-    for i in range(1000):
-        p, c, a_name_list = doctor_instance.simulate_run(policy)
-        pains.append(p)
-        costs.append(c)
-        instantiations.append(set(a_name_list))
+    print(cvar_values)
 
-    plt.hist(pains)
-    plt.title("Pain Rating upon Discharge")
+    df = pd.DataFrame({'Iteration': iteration_index, 'Value': iterations_values})
+
+    sns.lineplot(x='Iteration', y='Value', data=df, label='Expected Value')
+    if worst_values.size > 0:
+        df['Worst'] = worst_values
+        sns.lineplot(x='Iteration', y='Worst', data=df, label='Worst-Case Value')
+    if cvar_values.size > 0:
+        df['CVaR'] = cvar_values
+        sns.lineplot(x='Iteration', y='CVaR', data=df, label='Conditional Value at Risk')
+
+    plt.title("Expected vs. Worst-Case Value in Iterated Policy Improvement")
+    plt.ylim([0.5, 4.0])
     plt.show()
 
-    solution = solve_cssp(doctor_instance)
-    print(solution.costs)
-    print(solution.policies)
-    print(solution.probabilities)
-    print(solution.cvar)
+
+
+
+    #plt.plot(plot_data["Value"], color="red", label="expected policy value")
+    #if "Worst" in plot_data:
+    #    plt.plot(plot_data["Worst"], color="blue", label="worst case policy value")
+    #if "CVaR" in plot_data:
+    #    plt.plot(plot_data["CVaR"], color="green", label="conditional value at risk")
+    #plt.legend()
+    #plt.show()
 
 
 if __name__ == "__main__":

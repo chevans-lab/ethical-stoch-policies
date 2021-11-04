@@ -122,21 +122,22 @@ def solve_rmp(env: EthicalCsspEnv,
             m.addConstr((v == 1) >> (sup_var_probabilities[i] == probabilities[i]))
             m.addConstr((v == 0) >> (sup_var_probabilities[i] == 0))
 
-        cum_sub_var_prob = m.addVar(name="cum_sub_alpha", ub=1.0)
-        m.addConstr(cum_sub_var_prob == 1 - sup_var_probabilities.sum())
+        cum_sup_var_prob = m.addVar(name="cum_sup_var_prob", ub=1.0)
+        m.addConstr(cum_sup_var_prob == sup_var_probabilities.sum())
         norm_factor = m.addVar(name="norm_factor", lb=1.0)
-        m.addConstr((1 - cum_sub_var_prob) * norm_factor == 1.0)
+        m.addConstr(cum_sup_var_prob * norm_factor == 1.0)
 
         nonnorm_cvar_plus = m.addVar(name="non_normalised_cvar_plus", ub=max_cost)
-        cvar_plus = m.addVar(name="normalised_car_plus", lb=min_cost, ub=max_cost)
+        cvar_plus = m.addVar(name="normalised_cvar_plus", lb=min_cost, ub=max_cost)
         m.addConstr(nonnorm_cvar_plus * norm_factor == cvar_plus)
         m.addConstr(nonnorm_cvar_plus == gp.quicksum([sup_var_probabilities[i] * unopt_solution.costs[i, wellbeing_cost_index]
                                                       for i in range(num_policies)]))
 
         lmd = m.addVar(name="lambda")
-        m.addConstr(lmd == (cum_sub_var_prob - alpha) / (1 - alpha))
+        m.addConstr(lmd == (1 - cum_sup_var_prob - alpha) / (1 - alpha))
 
         conditional_value_at_risk = m.addVar(name="CVaR", lb=min_cost, ub=max_cost)
+        #m.addConstr(value_at_risk == conditional_value_at_risk)
         m.addConstr(conditional_value_at_risk == lmd * value_at_risk + cvar_plus - (lmd * cvar_plus))
 
         if enforce_additionals[4][0]:
