@@ -1,16 +1,14 @@
-from ethical_cssp_env import EthicalCsspEnv, State, Action
-from column_generation.column_gen_cssp_solution import ColumnGenCSSPSolution
+from env.ethical_cssp_env import MorallyConsequentialCsspEnv
+from stan_MC.stan_mc_cssp_solution import StAnMcCsspSolution
 from typing import List, Dict, Tuple
 import gurobipy as gp
 from gurobipy import GRB
 import numpy as np
 
 
-def optimal_deterministic_policy(env: EthicalCsspEnv,
-                     banned_policies: List[List[Tuple[int, str]]] = [],
-                     banned_flows: List[Tuple[int, str]] = []):
+def optimal_deterministic_policy(env: MorallyConsequentialCsspEnv):
 
-    m = gp.Model("rc-ssp")
+    m = gp.Model("optimal-det-cssp-policy")
 
     flow_variables: Dict[int, Dict[str, gp.Var]] = {}
     out_variables: Dict[int, gp.Var] = {}
@@ -78,17 +76,6 @@ def optimal_deterministic_policy(env: EthicalCsspEnv,
     print("Enforcing Complete Flow into goal states...")
     m.addConstr(gp.quicksum(list(in_variables_goal.values())) == 1, name=f"complete_flow_to_goal")
 
-    # Enforcing whole-policy bans:
-    for policy in banned_policies:
-        flow_outside_policy = [flow_variables[s.id][a.name] for s in env.state_space for a in env.applicable_actions(s)
-                               if (s.id in flow_variables and (s.id, a.name) not in policy)]
-        m.addConstr(gp.quicksum(flow_outside_policy) > 10e-4)
-
-    # Enforcing specific state-action bans
-    for state_id, action_name in banned_flows:
-        if state_id in flow_variables and action_name in flow_variables[state_id]:
-            m.addConstr(flow_variables[state_id][action_name] == 0)
-
     aggregate_costs = []
     obj = m.addVar(name="obj")
     aggregate_costs.append(obj)
@@ -108,7 +95,6 @@ def optimal_deterministic_policy(env: EthicalCsspEnv,
     m.setObjective(obj, GRB.MINIMIZE)
 
     print("Solving...")
-    m.write("model.lp")
     m.optimize()
 
     for var in m.getVars():
@@ -127,9 +113,9 @@ def optimal_deterministic_policy(env: EthicalCsspEnv,
 
     aggregate_costs = np.array([c.x for c in aggregate_costs])
 
-    return ColumnGenCSSPSolution(probabilities=np.array([1.0]),
-                                 costs=np.array([aggregate_costs]),
-                                 policies=np.array([return_policy]),
-                                 value=aggregate_costs[0],
-                                 worst_case_value=aggregate_costs[0],
-                                 cvar=aggregate_costs[0])
+    return StAnMcCsspSolution(probabilities=np.array([1.0]),
+                              costs=np.array([aggregate_costs]),
+                              policies=np.array([return_policy]),
+                              value=aggregate_costs[0],
+                              worst_case_value=aggregate_costs[0],
+                              cvar=aggregate_costs[0])

@@ -1,26 +1,26 @@
-from ethical_cssp_env import EthicalCsspEnv
-from column_generation.RMP_solver import solve_rmp
-from column_generation.SSP_random_walk import random_walk
+from env.ethical_cssp_env import MorallyConsequentialCsspEnv
+from stan_MC.RMP_solver import solve_rmp
+from stan_MC.SSP_random_walk import random_walk
 import numpy as np
 import copy
-from column_generation.det_SSP_solver import optimal_deterministic_policy
+from stan_MC.det_SSP_solver import optimal_deterministic_policy
 
 
-def initial_solution(env: EthicalCsspEnv):
+def initial_solution(env: MorallyConsequentialCsspEnv):
     return optimal_deterministic_policy(env)
 
 
-def generate_deterministic_policies(env: EthicalCsspEnv, n_policies, banned_policies, banned_flows):
+def generate_deterministic_policies(env: MorallyConsequentialCsspEnv, n_policies, banned_policies, banned_flows):
     return random_walk(env, n_policies)
 
 
-def solve_cssp(env: EthicalCsspEnv, sample_size=10, n_iterations=100):
+def solve_cssp(env: MorallyConsequentialCsspEnv, sample_size=25, n_iterations=100):
     solution = initial_solution(env)
     enforce_additional_constraints = [(True, 10),
                                       (False, 0.5),
                                       (False, 0),
                                       (False, 0),
-                                      (True, 10),
+                                      (True, 1.4),
                                       (False, 0)]
 
     track_worst = enforce_additional_constraints[0][0] or enforce_additional_constraints[1][0] or enforce_additional_constraints[2][0] or enforce_additional_constraints[3][0]

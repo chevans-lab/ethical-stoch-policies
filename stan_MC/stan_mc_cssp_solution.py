@@ -2,7 +2,7 @@ from typing import List, Dict
 import numpy as np
 
 
-class ColumnGenCSSPSolution:
+class StAnMcCsspSolution:
     probabilities: np.ndarray
     costs: np.ndarray
     policies: np.ndarray

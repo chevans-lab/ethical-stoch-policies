@@ -1,10 +1,10 @@
-from ethical_cssp_env import EthicalCsspEnv, State, Action
+from env.ethical_cssp_env import MorallyConsequentialCsspEnv, State, Action
 from typing import List, Tuple, Dict
 from random import randrange
 import numpy as np
 
 
-def random_walk(env: EthicalCsspEnv, n_policies: int):
+def random_walk(env: MorallyConsequentialCsspEnv, n_policies: int):
 
     policies = []
     cost_vectors = []

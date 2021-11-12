@@ -2,12 +2,12 @@ import gurobipy as gp
 from gurobipy import GRB
 import numpy as np
 from typing import List, Tuple
-from column_generation.column_gen_cssp_solution import ColumnGenCSSPSolution
-from ethical_cssp_env import EthicalCsspEnv
+from stan_MC.stan_mc_cssp_solution import StAnMcCsspSolution
+from env.ethical_cssp_env import MorallyConsequentialCsspEnv
 
 
-def solve_rmp(env: EthicalCsspEnv,
-              unopt_solution: ColumnGenCSSPSolution,
+def solve_rmp(env: MorallyConsequentialCsspEnv,
+              unopt_solution: StAnMcCsspSolution,
               enforce_additionals: List[Tuple[bool, float]],
               wellbeing_cost_index=0,
               alpha=0.5):
@@ -164,8 +164,7 @@ def solve_rmp(env: EthicalCsspEnv,
         if enforce_additionals[4][0] or enforce_additionals[5][0]:
             unopt_solution.cvar = m.getVarByName("CVaR").x
     except AttributeError:
-        m.computeIIS()
-        m.write("column_generation/model.ilp")
+        pass
 
     return unopt_solution
 

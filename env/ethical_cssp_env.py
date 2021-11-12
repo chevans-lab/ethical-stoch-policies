@@ -22,7 +22,7 @@ class Action(ABC):
         self.name = name
 
 
-class EthicalCsspEnv(ABC):
+class MorallyConsequentialCsspEnv(ABC):
 
     state_space: List[State]
     initial_state: State
