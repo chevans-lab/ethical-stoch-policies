@@ -9,10 +9,29 @@ import copy
 
 
 def initial_solution(env: MorallyConsequentialCsspEnv):
+    """
+    Generates an initial solution to the morally consequential C-SSP. This will be the optimal feasible deterministic policy,
+    represented in the form of a StAnMcCsspSolution object.
+
+    Args:
+        env: The morally consequential C-SSP instance
+    Returns:
+        StAnMcCsspSolution
+    """
     return optimal_deterministic_policy(env)
 
 
 def generate_deterministic_policies(env: MorallyConsequentialCsspEnv, n_policies):
+    """
+    Randomly samples a batch of deterministic policies for some (acyclic) C-SSP. Policies may be infeasible.
+
+    Args:
+        env: The morally consequential C-SSP instance
+        n_policies: The number of deterministic policies to sample
+
+    Returns:
+
+    """
     return random_walk(env, n_policies)
 
 
@@ -56,7 +75,7 @@ def solve_cssp(env: MorallyConsequentialCsspEnv, constraint_params: Dict[str, fl
             new_solution.costs = np.concatenate((new_solution.costs, cost_vectors), axis=0)
             new_solution.policies = np.concatenate((new_solution.policies, policies))
 
-            new_solution = solve_rmp(env, new_solution, constraint_params, alpha=0.95)
+            new_solution = solve_rmp(env, new_solution, constraint_params)
 
             if new_solution.value < solution.value:
                 solution = new_solution

@@ -1,15 +1,15 @@
+from stan_MC.stan_mc_cssp_solution import StAnMcCsspSolution
+from env.ethical_cssp_env import MorallyConsequentialCsspEnv
+
 import gurobipy as gp
 from gurobipy import GRB
 import numpy as np
-from typing import List, Tuple, Dict
-from stan_MC.stan_mc_cssp_solution import StAnMcCsspSolution
-from env.ethical_cssp_env import MorallyConsequentialCsspEnv
+from typing import Dict
 
 
 def solve_rmp(env: MorallyConsequentialCsspEnv,
               unopt_solution: StAnMcCsspSolution,
-              constraint_params: Dict[str, float],
-              alpha=0.5):
+              constraint_params: Dict[str, float]):
 
     """
     The various value parameters which carry over from the previous iteration of the overall loop
@@ -17,34 +17,21 @@ def solve_rmp(env: MorallyConsequentialCsspEnv,
     definitions for brevity)
 
     Args:
-        policy_costs: 2D array of costs incurred by deterministic policies in RMP
-                        (rows are policies, columns are cost functions)
-        last_v: Expected cost of the stochastic policy as of the last iteration
-        last_cvar: The conditional value-at-risk (confidence 1-alpha) as of the last iteration
-        last_worst: Highest expected cost of a deterministic policy in last iteration's stochastic policy
-                    with non-zero probability
-        cost_bounds: The C-SSP upper bounds on secondary costs (primary cost is to be included in the list at index 0,
-                    but is assumed to be None)
-        mc_cost_index: The index of the cost function amongst our k functions which is 'wellbeing-based' (MUST BE 0)
-        alpha: Defined as (1 - confidence), hyperparameter to conditional value-at-risk
-        enforce_additionals: List of bool, float tuples declaring whether to enforce each of the 6 constraints on risk:
-                -- 0. If bool, then float will be an upper bound on wellbeing cost of worst det. policy in the mix
-                -- 1. If bool, then each iteration must decrease expected wellbeing cost by <float> times the increase
-                        in wellbeing cost of worst det. policy in the mix
-                -- 2. If bool, then float will be upper bound on diff. between best and worst wellbeing costs of
-                        det. policies in the mix
-                -- 3. If bool, then each iteration must decrease expected wellbeing cost by <float> times the increase
-                        in best/worst wellbeing gap
-                -- 4. If bool, then float will be the upper bound on Conditional Value-at-Risk_alpha
-                -- 5. If bool, then each iteration must decrease expected wellbeing cost by <float> times the increase
-                        in CVaR_alpha of the wellbeing cost
-
+        env: The morally consequential C-SSP instance
+        unopt_solution: an unoptimised solution to the C-SSP instance. new deterministic policies have been added to its usable set,
+            but the probability distribution over them needs to be re-optimised (which is the job of this function)
+        constraint_params: A string -> float mapping for parameterising the constraints we want to enforce.
+            -- If "bound_wcv" is provided, it maps to the upper bound on worst-case value that should be enforced
+            -- If "bound_ewd" is provided, it maps to the upper bound on difference between expected and worst-case value that should be enforced
+            -- If "tradeoff_wcv" is provided, it maps to the weighting to give to the worst-case value increase in the tradeoff constraint.
+            -- If "tradeoff_cvar" is provided, it maps to the weighting to give to the conditional value at risk increase in the tradeoff constraint.
     Returns:
-
+        StAnMcCsspSolution
     """
 
     m = gp.Model("augmented_rmp")
     mc_cost_index = 0
+    alpha = 0.9
 
     num_policies = unopt_solution.costs.shape[0]
 
