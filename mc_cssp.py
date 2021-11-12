@@ -29,7 +29,8 @@ def solve_and_plot(instance_name: str, constraint_params: Dict[str, float], iter
         solution, plot_data = solve_cssp(medic_instance,
                                          constraint_params=constraint_params,
                                          iterations=iterations,
-                                         sample_size=sample_size)
+                                         sample_size=sample_size,
+                                         store_plot_data=True)
 
         expected_value_data[np.arange(i * iterations, (i + 1) * iterations)] = plot_data["Value"]
         if "Worst" in plot_data:
