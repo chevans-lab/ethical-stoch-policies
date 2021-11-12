@@ -97,13 +97,6 @@ def optimal_deterministic_policy(env: MorallyConsequentialCsspEnv):
     print("Solving...")
     m.optimize()
 
-    for var in m.getVars():
-        if var.varName.startswith(f"x_") and var.x > 10e-6:
-            print('%s %g' % (var.varName, var.x))
-
-    for s in env.state_space:
-        print(f"{s.id}: Pain={s.pain} and Actions taken={[a.name for a in s.actions_taken]}")
-
     return_policy = {}
     for s in env.state_space:
         if not env.terminal_state(s):
