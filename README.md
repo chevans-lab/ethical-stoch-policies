@@ -56,6 +56,18 @@ We recommend experimenting with enforcing one or a couple of constraints at once
 
 ### Output
 
+Since policies are not particularly human-readable, we do not output them as part of the `mc_ccsp.py` script (if interested, `stan_MC/stan_main.py#solve_cssp` would output the information you are after).
+
+Instead, we produce plots of the evolution of the expected value of the best current solution found by StAn-MC over the number of iterations taken for it to be found. Assuming `REPETITIONS` > 1, this will be a lineplot of the mean expected value achieved at each iteration across all of the repeated solves. There will also be a confidence interval for each iteration, displayed as a shaded region around the lineplot.
+
+For example, running `python3 mc_cssp.py` with no explicit arguments will solve `medic_small` 20 times with no moral acceptability constraints, and should output a plot similar to the following:
+
+![Plot_No_Constraints](img/plot_no_constraints.png)
+
+If constraints are enforced, the metrics/measured being used to enforce those constraints will also be plotted in the same format. So for example, if we enforce constraints which invoke worst-case value and CVaR, e.g. `python3 mc_cssp.py --tradeoff_cvar 0.5 --bound_wcv 1.5`, the evolution of worst-case value and CVaR over time will be plotted as well, to allow you to verify that the constraints are having the desired effect:
+
+![Plot_With_Constraints](img/plot_with_constraints.png)
+
 ## 
 
 For more information on the experimental context and setup, please see the report and the implementation docstrings.
