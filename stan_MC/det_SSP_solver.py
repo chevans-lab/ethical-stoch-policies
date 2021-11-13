@@ -145,4 +145,4 @@ def optimal_deterministic_policy(env: MorallyConsequentialCsspEnv):
                               policies=np.array([return_policy]),
                               value=aggregate_costs[0],
                               worst_case_value=aggregate_costs[0],  # equals expected value in this special deterministic case
-                              cvar=aggregate_costs[0])  # equals expected value in this special determistic case
+                              cvar=aggregate_costs[0])  # equals expected value in this special deterministic case

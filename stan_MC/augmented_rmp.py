@@ -221,14 +221,3 @@ def solve_rmp(env: MorallyConsequentialCsspEnv,
         pass
 
     return optimised_solution
-
-
-
-
-
-
-
-
-
-
-
