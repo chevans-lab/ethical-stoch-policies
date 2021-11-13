@@ -1,7 +1,7 @@
 from env.mc_cssp_env import MorallyConsequentialCsspEnv
 from stan_MC.augmented_rmp import solve_rmp
 from stan_MC.ssp_random_walk import random_walk
-from stan_MC.det_SSP_solver import optimal_deterministic_policy
+from stan_MC.det_ssp_solver import optimal_deterministic_policy
 
 from typing import Dict
 import numpy as np
