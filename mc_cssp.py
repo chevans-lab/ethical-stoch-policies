@@ -49,6 +49,8 @@ def solve_and_plot(instance_name: str, constraint_params: Dict[str, float], iter
     # Creating a plot of the evolution of the expected value and the relevant disadvantage metrics over the improvement iterations.
     # Plots all repetitions of the solving process at once, by plotting the mean value of the metric at each timestep as a line plot,
     # and the confidence interval of the metric at each timestep across all solves as a shaded region.
+    print()
+    print("Collating data for results plot. Loading...")
     df = pd.DataFrame({'Iteration': iteration_index, 'Expected Value': expected_value_data})
     sns.lineplot(x='Iteration', y='Expected Value', data=df, label='Expected Value')
     if "tradeoff_wcv" in constraint_params or "bound_wcv" in constraint_params:
