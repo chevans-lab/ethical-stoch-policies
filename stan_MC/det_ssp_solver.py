@@ -28,7 +28,6 @@ def optimal_deterministic_policy(env: MorallyConsequentialCsspEnv):
 
     Returns:
         StAnMcCsspSolution
-
     """
 
     m = gp.Model("optimal-det-cssp-policy")

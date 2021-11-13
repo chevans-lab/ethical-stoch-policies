@@ -12,7 +12,7 @@ This is my own work, and forms part of my artefact contribution for COMP3770, Se
 
 class State(ABC):
     """
-    Abstract class for a C-SSP state
+    Abstract class for a C-SSP state.
     """
     id: int
 
