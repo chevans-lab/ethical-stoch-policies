@@ -1,5 +1,6 @@
 from env.ethical_cssp_env import MorallyConsequentialCsspEnv
 from stan_MC.stan_mc_cssp_solution import StAnMcCsspSolution
+
 from typing import Dict
 import gurobipy as gp
 from gurobipy import GRB
@@ -64,7 +65,6 @@ def optimal_deterministic_policy(env: MorallyConsequentialCsspEnv):
             m.addConstr(in_s == 0, name=f"in_{s.id}_c")
 
     # Conservation of flow
-    print("Enforcing conservation of flow...")
     for s in env.state_space:
         if not env.terminal_state(s):
             aggregate_flow = 0
@@ -73,7 +73,6 @@ def optimal_deterministic_policy(env: MorallyConsequentialCsspEnv):
             m.addConstr(out_variables[s.id] - in_variables_transient[s.id] == aggregate_flow, name=f"flow_cons_{s.id}")
 
     # Complete flow into goal states
-    print("Enforcing Complete Flow into goal states...")
     m.addConstr(gp.quicksum(list(in_variables_goal.values())) == 1, name=f"complete_flow_to_goal")
 
     aggregate_costs = []
@@ -94,7 +93,7 @@ def optimal_deterministic_policy(env: MorallyConsequentialCsspEnv):
 
     m.setObjective(obj, GRB.MINIMIZE)
 
-    print("Solving...")
+    m.params.LogToConsole = 0
     m.optimize()
 
     return_policy = {}

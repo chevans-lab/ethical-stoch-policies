@@ -74,6 +74,8 @@ def solve_cssp(env: MorallyConsequentialCsspEnv,
 
     # Produce initial feasible & acceptable solution
     solution = initial_solution(env)
+    print(f"Initial feasible and acceptable policy found: expected primary cost = {solution.value}")
+    print(f"Initial solution to undergo {iterations - 1} potential improvement iterations:")
 
     if store_plot_data:
         plot_data["Value"][0] = solution.value
@@ -100,7 +102,7 @@ def solve_cssp(env: MorallyConsequentialCsspEnv,
             # Updating current best solution if an improvement in objective has been achieved
             if new_solution.value < solution.value:
                 solution = new_solution
-                print("Found a better acceptable policy, with objective:", solution.value)
+                print(f"Iteration {i}: New feasible and acceptable policy found with lower expected primary cost: {solution.value}")
 
             if store_plot_data:
                 # Recording datapoints of expected value and disadvantage measures as of i-th iteration
@@ -113,8 +115,12 @@ def solve_cssp(env: MorallyConsequentialCsspEnv,
                     plot_data["CVaR"][i] = solution.cvar
 
         except KeyboardInterrupt:
-            print("Ending search and returning best known acceptable policy")
+            print("Ending search and returning best known feasible and acceptable policy")
+            print("---------------------------------------------------------------------")
+            print()
             return solution, plot_data
 
-    print("Ending search and returning best known acceptable policy")
+    print("Ending search and returning best known feasible and acceptable policy")
+    print("---------------------------------------------------------------------")
+    print()
     return solution, plot_data

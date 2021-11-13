@@ -29,7 +29,10 @@ def solve_rmp(env: MorallyConsequentialCsspEnv,
         StAnMcCsspSolution
     """
 
-    m = gp.Model("augmented_rmp")
+    solver_env = gp.Env(empty=True)
+    solver_env.setParam("OutputFlag", 0)
+    solver_env.start()
+    m = gp.Model("augmented_rmp", env=solver_env)
 
     mc_cost_index = 0  # index of C-SSP cost function that is morally consequential (always the 0th in our formulation)
     alpha = 0.9  # preconfiguring the alpha hyperparameter for CVaR tradeoff constraint; see report for more info

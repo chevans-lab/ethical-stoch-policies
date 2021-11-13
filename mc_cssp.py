@@ -16,8 +16,10 @@ This is my own work, and forms part of my artefact contribution for COMP3770, Se
 
 
 def solve_and_plot(instance_name: str, constraint_params: Dict[str, float], iterations: int, sample_size: int, repetitions: int):
+    # Resolving problem instance
     medic_instance = medic_env.construct_instance(instance_name)
 
+    # Initialising stores for datapoints for plotting solver performance
     num_datapoints = repetitions * iterations
     iteration_index = np.arange(num_datapoints) % iterations
     expected_value_data = np.empty(num_datapoints)
@@ -26,6 +28,8 @@ def solve_and_plot(instance_name: str, constraint_params: Dict[str, float], iter
     cvar_data = np.empty(num_datapoints)
 
     for i in range(repetitions):
+        print(f"Solving problem instance {instance_name}: solve number {i + 1} of {repetitions}. Commencing...")
+
         solution, plot_data = solve_cssp(medic_instance,
                                          constraint_params=constraint_params,
                                          iterations=iterations,
@@ -104,9 +108,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Parsing instance parameter
+    valid_instance_names = ['medic_small']
     instance_name = args.instance
     if instance_name is None:
         instance_name = "medic_small"
+    else:
+        if instance_name not in valid_instance_names:
+            raise ValueError(f"Invalid instance: instance_name must be one of the following: {valid_instance_names}")
 
     # Parsing constraint parameters
     constraint_params = {}
