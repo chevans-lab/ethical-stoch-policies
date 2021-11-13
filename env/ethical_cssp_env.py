@@ -30,7 +30,6 @@ class MorallyConsequentialCsspEnv(ABC):
     action_space: List[Action]
     secondary_cost_bounds = List[float]
     num_secondary_costs = int
-    wellbeing_costs = List[bool]
 
     def __init__(self,
                  state_space,
@@ -38,15 +37,13 @@ class MorallyConsequentialCsspEnv(ABC):
                  goal_states,
                  action_space,
                  secondary_cost_bounds,
-                 num_secondary_costs,
-                 wellbeing_costs):
+                 num_secondary_costs):
         self.state_space = state_space
         self.initial_state = initial_state
         self.goal_states = goal_states
         self.action_space = action_space
         self.secondary_cost_bounds = secondary_cost_bounds
         self.num_secondary_costs = num_secondary_costs
-        self.wellbeing_costs = wellbeing_costs
 
     @abstractmethod
     def applicable_actions(self, s: State) -> List[Action]:

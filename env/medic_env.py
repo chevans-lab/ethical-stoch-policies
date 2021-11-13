@@ -46,15 +46,13 @@ class MedicEnv(MorallyConsequentialCsspEnv):
                  goal_states,
                  action_space,
                  secondary_cost_bounds,
-                 num_secondary_costs,
-                 wellbeing_costs):
+                 num_secondary_costs):
         super().__init__(state_space,
                          initial_state,
                          goal_states,
                          action_space,
                          secondary_cost_bounds,
-                         num_secondary_costs,
-                         wellbeing_costs)
+                         num_secondary_costs)
 
     def applicable_actions(self, s: MedicState) -> List[MedicAction]:
         if not [a for a in s.actions_taken if a.name == MedicActionName.Discharge]:
@@ -122,12 +120,10 @@ def construct_instance(name: str) -> MedicEnv:
         initial_state = [state for state in state_space if state.pain == 10 and len(state.actions_taken) == 0][0]
 
         secondary_cost_bounds = [1200]
-        wellbeing_costs = [True, False]
 
         return MedicEnv(state_space,
                         initial_state,
                         goal_states,
                         action_list,
                         secondary_cost_bounds,
-                        len(secondary_cost_bounds),
-                        wellbeing_costs)
+                        len(secondary_cost_bounds))

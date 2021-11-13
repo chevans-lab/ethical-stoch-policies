@@ -1,4 +1,3 @@
-from typing import List, Dict
 import numpy as np
 
 
@@ -17,9 +16,3 @@ class StAnMcCsspSolution:
         self.value = value
         self.worst_case_value = worst_case_value
         self.cvar = cvar
-
-    def get_policy_value(self):
-        v = 0
-        for i in range(len(self.probabilities)):
-            v += self.probabilities[i] * self.costs[i, 0]
-        return v

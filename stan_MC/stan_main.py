@@ -42,6 +42,25 @@ def solve_cssp(env: MorallyConsequentialCsspEnv,
                iterations: int,
                store_plot_data=False):
 
+    """
+    Solves a morally consquential C-SSP using StAn-MC. Returns the policy object, and a dictionary of data to plot the solution evolution if requested.
+    
+    Args:
+        env: The morally consequential C-SSP instance
+        constraint_params: A string -> float mapping for parameterising the constraints we want to enforce.
+            -- If "bound_wcv" is provided, it maps to the upper bound on worst-case value that should be enforced
+            -- If "bound_ewd" is provided, it maps to the upper bound on difference between expected and worst-case value that should be enforced
+            -- If "tradeoff_wcv" is provided, it maps to the weighting to give to the worst-case value increase in the tradeoff constraint.
+            -- If "tradeoff_cvar" is provided, it maps to the weighting to give to the conditional value at risk increase in the tradeoff constraint.
+        sample_size: Batch size of deterministic policies to randomly sample at each iteration of StAn-MC.
+        iterations: Number of policy improvement iterations for StAn-MC to perform.
+        store_plot_data: Boolean configuring whether to store the expected value and other metrics about the policy at each iteration, 
+            for use in plotting algorithm performance
+
+    Returns:
+        Tuple[StAnMcCsspSolution, Dict[str, np.ndarray]]
+    """
+
     plot_data = None
     if store_plot_data:
         # Creating data arrays to store data for result plotting
