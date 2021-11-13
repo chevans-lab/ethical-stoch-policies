@@ -8,6 +8,7 @@ This is my own work, and forms part of my artefact contribution for COMP3770, Se
 
 class StAnMcCsspSolution:
     """
+    StAn-MC C-SSP Solution (StAnMcCsspSolution).
     Represents a stochastic policy for a morally consequential C-SSP in a 'concentrated' representation.
     The probabilities, costs and policies fields are numpy arrays, all ordered in the same way,
     where the i-th entries of the former two arrays represent the probability of sampling the i-th (deterministic) policy in policies,
