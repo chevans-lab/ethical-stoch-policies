@@ -47,9 +47,10 @@ StAn-MC can then be used to solve a C-SSP instance and have the results plotted 
     - `SAMPLE_SIZE` is the batch size of determinstic candidate policies sampled at each improvement iteration. Must be a positive `int`. Defaults to `20`.
     - `REPETITIONS` is the number of times the C-SSP will be solved before termination. Multiple consecutive solves are used to define and plot a confidence interval on the results, since StAn-MC is a stochastic algorithm. Must be a positive `int`. Defaults to `20`.
 - Acceptability Constraint Parameters:
-    - `WCV_Bound` is the upper bound on Worst-Case expected Value of any deterministic policy included in the stochastic policy's distribution. Referred to as `h` in the report.
-    - `EWD_Bound` is the upper bound on the difference between the expected value of the stochastic policy and the worst-case expected value of any deterministic policy included in the stochastic policy's distribution; i.e. the 'Expected-Worst Difference'. Referred to as `h'` in the report.
-
+    - `WCV_Bound` is the upper bound on Worst-Case expected Value of any deterministic policy included in the stochastic policy's distribution. Referred to as `h` in the report. Defaults to `None`, meaning that the constraint will not be enforced.
+    - `EWD_Bound` is the upper bound on the difference between the expected value of the stochastic policy and the worst-case expected value of any deterministic policy included in the stochastic policy's distribution; i.e. the 'Expected-Worst Difference'. Referred to as `h'` in the report. Defaults to `None`, meaning that the constraint will not be enforced.
+    - `WCV_TRADEOFF_RATE` is the weighting given to the increase in worst-case value from one StAn-MC iteration to the next, relative to the decrease in expected value. This is used to constrain the weight-multiplied worst-case value increase not to exceed the expected value decrease from one iteration to the next. Referred to as `θ` in the report. Defaults to `None`, meaning that the constraint will not be enforced.
+    - `CVAR_TRADEOFF_RATE` is the weighting given to the increase in Conditional Value-at-Risk (CVaR) from one StAn-MC iteration to the next, relative to the decrease in expected value. This is used to constrain the weight-multiplied CVaR increase not to exceed the expected value decrease from one iteration to the next. Referred to as `θ'` in the report. Defaults to `None`, meaning that the constraint will not be enforced.
 
 ## 
 
