@@ -52,6 +52,10 @@ StAn-MC can then be used to solve a C-SSP instance and have the results plotted 
     - `WCV_TRADEOFF_RATE` is the weighting given to the increase in worst-case value from one StAn-MC iteration to the next, relative to the decrease in expected value. This is used to constrain the weight-multiplied worst-case value increase not to exceed the expected value decrease from one iteration to the next. Referred to as `θ` in the report. Defaults to `None`, meaning that the constraint will not be enforced.
     - `CVAR_TRADEOFF_RATE` is the weighting given to the increase in Conditional Value-at-Risk (CVaR) from one StAn-MC iteration to the next, relative to the decrease in expected value. This is used to constrain the weight-multiplied CVaR increase not to exceed the expected value decrease from one iteration to the next. Referred to as `θ'` in the report. Defaults to `None`, meaning that the constraint will not be enforced.
 
+We recommend experimenting with enforcing one or a couple of constraints at once (e.g. one bound-type and one tradeoff-type, rather than all at once.
+
+### Output
+
 ## 
 
 For more information on the experimental context and setup, please see the report and the implementation docstrings.
