@@ -197,8 +197,8 @@ def construct_instance(name: str) -> MedicEnv:
     if name == 'medic_small':
 
         # Three available painkillers
-        action_list = [MedicAction(MedicActionName.B, 600, DiscreteDistribution([(3, 0.25), (5, 0.25), (6, 0.5)])),
-                       MedicAction(MedicActionName.A, 1000, DiscreteDistribution([(5, 0.25), (6, 0.25), (10, 0.5)])),
+        action_list = [MedicAction(MedicActionName.A, 1000, DiscreteDistribution([(5, 0.25), (6, 0.25), (10, 0.5)])),
+                       MedicAction(MedicActionName.B, 600, DiscreteDistribution([(3, 0.25), (5, 0.25), (6, 0.5)])),
                        MedicAction(MedicActionName.C, 500, DiscreteDistribution([(0, 0.2), (5, 0.8)])),
                        MedicAction(MedicActionName.Discharge, 0, None)]
 
