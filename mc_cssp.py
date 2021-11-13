@@ -27,16 +27,22 @@ def solve_and_plot(instance_name: str, constraint_params: Dict[str, float], iter
     ewd_data = np.empty(num_datapoints)
     cvar_data = np.empty(num_datapoints)
 
+    # Initialising stores for cost reduction percentage and solve time metrics
+    percentage_reductions = np.empty(repetitions)
+    solve_times = np.empty(repetitions)
+
     for i in range(repetitions):
         print(f"Solving problem instance {instance_name}: solve number {i + 1} of {repetitions}. Commencing...")
 
         # Solving morally consequential C-SSP
-        solution, plot_data = solve_cssp(medic_instance,
-                                         constraint_params=constraint_params,
-                                         iterations=iterations,
-                                         sample_size=sample_size,
-                                         store_plot_data=True)
-
+        solution, plot_data, percentage_reduction, solve_time = solve_cssp(medic_instance,
+                                                                           constraint_params=constraint_params,
+                                                                           iterations=iterations,
+                                                                           sample_size=sample_size,
+                                                                           store_plot_data=True)
+        # Storing solve time and percentage reduction data
+        percentage_reductions[i] = percentage_reduction
+        solve_times[i] = solve_time
         # Storing the plot datapoints for any constraints that we are enforcing
         expected_value_data[np.arange(i * iterations, (i + 1) * iterations)] = plot_data["Value"]
         if "Worst" in plot_data:
@@ -46,11 +52,16 @@ def solve_and_plot(instance_name: str, constraint_params: Dict[str, float], iter
         if "CVaR" in plot_data:
             cvar_data[np.arange(i * iterations, (i + 1) * iterations)] = plot_data["CVaR"]
 
+    average_percent_reduction = "{:.3f}".format(np.sum(percentage_reductions) / repetitions)
+    average_time = "{:.3f}".format(np.sum(solve_times) / repetitions)
+    print()
+    print(f"Over {repetitions} repetitions, StAn-MC was able to find a policy with expected cost on average {average_percent_reduction}% lower than the optimal feasible deterministic policy.")
+    print(f"Average time to produce an initial solution and {iterations - 1} improvement iterations was {average_time} seconds.")
+    print("Collating data for results plot. Loading...")
+
     # Creating a plot of the evolution of the expected value and the relevant disadvantage metrics over the improvement iterations.
     # Plots all repetitions of the solving process at once, by plotting the mean value of the metric at each timestep as a line plot,
     # and the confidence interval of the metric at each timestep across all solves as a shaded region.
-    print()
-    print("Collating data for results plot. Loading...")
     df = pd.DataFrame({'Iteration': iteration_index, 'Expected Value': expected_value_data})
     sns.lineplot(x='Iteration', y='Expected Value', data=df, label='Expected Value')
     if "tradeoff_wcv" in constraint_params or "bound_wcv" in constraint_params:
