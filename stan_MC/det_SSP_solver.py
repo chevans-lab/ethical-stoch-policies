@@ -1,4 +1,4 @@
-from env.ethical_cssp_env import MorallyConsequentialCsspEnv
+from env.mc_cssp_env import MorallyConsequentialCsspEnv
 from stan_MC.stan_mc_cssp_solution import StAnMcCsspSolution
 
 from typing import Dict

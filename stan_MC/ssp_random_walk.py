@@ -1,4 +1,4 @@
-from env.ethical_cssp_env import MorallyConsequentialCsspEnv, State, Action
+from env.mc_cssp_env import MorallyConsequentialCsspEnv, State, Action
 from typing import List, Tuple, Dict
 from random import randrange
 import numpy as np
