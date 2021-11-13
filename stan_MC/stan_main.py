@@ -7,6 +7,12 @@ from typing import Dict
 import numpy as np
 import copy
 
+"""
+Author: Charles Evans
+Email: u6942700@anu.edu.au
+This is my own work, and forms part of my artefact contribution for COMP3770, Semester 1, 2021.
+"""
+
 
 def initial_solution(env: MorallyConsequentialCsspEnv):
     """

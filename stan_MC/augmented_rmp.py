@@ -6,6 +6,11 @@ from gurobipy import GRB
 import numpy as np
 from typing import Dict
 
+"""
+Author: Charles Evans
+Email: u6942700@anu.edu.au
+This is my own work, and forms part of my artefact contribution for COMP3770, Semester 1, 2021.
+"""
 
 def solve_rmp(env: MorallyConsequentialCsspEnv,
               unopt_solution: StAnMcCsspSolution,
@@ -186,6 +191,7 @@ def solve_rmp(env: MorallyConsequentialCsspEnv,
 
     m.optimize()
 
+    # Combining the newly optimised distribution and the unoptimised solution to create a new optimised solution
     optimised_solution = unopt_solution
     try:
         optimized_probabilities = np.empty(num_policies)

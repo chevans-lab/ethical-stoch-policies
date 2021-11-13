@@ -30,12 +30,14 @@ def solve_and_plot(instance_name: str, constraint_params: Dict[str, float], iter
     for i in range(repetitions):
         print(f"Solving problem instance {instance_name}: solve number {i + 1} of {repetitions}. Commencing...")
 
+        # Solving morally consequential C-SSP
         solution, plot_data = solve_cssp(medic_instance,
                                          constraint_params=constraint_params,
                                          iterations=iterations,
                                          sample_size=sample_size,
                                          store_plot_data=True)
 
+        # Storing the plot datapoints for any constraints that we are enforcing
         expected_value_data[np.arange(i * iterations, (i + 1) * iterations)] = plot_data["Value"]
         if "Worst" in plot_data:
             wcv_data[np.arange(i * iterations, (i + 1) * iterations)] = plot_data["Worst"]
@@ -44,8 +46,10 @@ def solve_and_plot(instance_name: str, constraint_params: Dict[str, float], iter
         if "CVaR" in plot_data:
             cvar_data[np.arange(i * iterations, (i + 1) * iterations)] = plot_data["CVaR"]
 
+    # Creating a plot of the evolution of the expected value and the relevant disadvantage metrics over the improvement iterations.
+    # Plots all repetitions of the solving process at once, by plotting the mean value of the metric at each timestep as a line plot,
+    # and the confidence interval of the metric at each timestep across all solves as a shaded region.
     df = pd.DataFrame({'Iteration': iteration_index, 'Expected Value': expected_value_data})
-
     sns.lineplot(x='Iteration', y='Expected Value', data=df, label='Expected Value')
     if "tradeoff_wcv" in constraint_params or "bound_wcv" in constraint_params:
         df['Worst'] = wcv_data
@@ -56,7 +60,6 @@ def solve_and_plot(instance_name: str, constraint_params: Dict[str, float], iter
     if "tradeoff_cvar" in constraint_params:
         df['CVaR'] = cvar_data
         sns.lineplot(x='Iteration', y='CVaR', data=df, label='Conditional Value at Risk')
-
     plt.title("Evolution of Expected and Disadvantaged Policy Value")
     plt.show()
 
