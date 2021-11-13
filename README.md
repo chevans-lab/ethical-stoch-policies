@@ -41,7 +41,14 @@ As a precursor, the following python packages may need to be installed (if they 
 StAn-MC can then be used to solve a C-SSP instance and have the results plotted as a lineplot of the various performance metrics over number of policy mprovement iterations. To do, run the following command from the root of the repository:
 
 `python3 mc_cssp.py [--instance INSTANCE] [--iterations ITERATIONS] [--sample_size SAMPLE_SIZE] [--repetitions REPETITIONS] [--bound_wcv WCV_BOUND] [--bound_ewd EWD_BOUND] [--tradeoff_wcv WCV_TRADEOFF_RATE] [--tradeoff_cvar CVAR_TRADEOFF_RATE]`
-
+- Algorithm/Solver Parameters:
+    - `INSTANCE` is the name of the c-ssp to be solved. Currently, only `medic_small` is a valid option. Defaults to `medic_small` if parameter not specified.
+    - `ITERATIONS` is the number of improvement iterations StAn-MC will attempt on its initial policy. Must be a positive `int`. Defaults to `50`.
+    - `SAMPLE_SIZE` is the batch size of determinstic candidate policies sampled at each improvement iteration. Must be a positive `int`. Defaults to `20`.
+    - `REPETITIONS` is the number of times the C-SSP will be solved before termination. Multiple consecutive solves are used to define and plot a confidence interval on the results, since StAn-MC is a stochastic algorithm. Must be a positive `int`. Defaults to `20`.
+- Acceptability Constraint Parameters:
+    - `WCV_Bound` is the upper bound on Worst-Case expected Value of any deterministic policy included in the stochastic policy's distribution. Referred to as `h` in the report.
+    - `EWD_Bound` is the upper bound on the difference between the expected value of the stochastic policy and the worst-case expected value of any deterministic policy included in the stochastic policy's distribution; i.e. the 'Expected-Worst Difference'. Referred to as `h'` in the report.
 
 
 ## 
