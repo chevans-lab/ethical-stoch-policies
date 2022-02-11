@@ -68,32 +68,67 @@ def optimal_deterministic_policy(env: MorallyConsequentialCsspEnv):
             else:
                 m.addConstr(out_s == 0)
 
+
+    # Sylvie's version===================================
     # Creating, constraining and storing in(s) variables for all transient states s
+    flow_parents = {}
+    succession_probabilities = {}
+    in_vars = {}
     for s in env.state_space:
         in_s = m.addVar(name=f"in_{s.id}")
+        in_vars[s.id] = in_s
         if env.terminal_state(s):
             in_variables_goal[s.id] = in_s
         else:
             in_variables_transient[s.id] = in_s
+        flow_parents[s.id] = []
+        succession_probabilities[s.id] = []
 
-        # Finding all transition 'parents' of s, and temp. storing their flow variables and the transition probabilities
-        flow_parents = []
-        succession_probabilities = []
-        for s_ in env.state_space:
-            for a in env.applicable_actions(s_):
-                transition_probabilities = env.transition_probabilities(s_, a)
-                for element, probability in transition_probabilities.get_values():
-                    if element.id == s.id:
-                        succession_probabilities.append(probability)
-                        flow_parents.append(flow_variables[s_.id][a.name])
 
-        # in(s) == transition-probability-weighted sum of flows of transition parents
-        if flow_parents:
-            m.addConstr(in_s == flow_parents @ np.array(succession_probabilities))
+    # Finding all transition 'parents' of s, and temp. storing their flow variables and the transition probabilities
+    for s_ in env.state_space:
+        for a in env.applicable_actions(s_):
+            transition_probabilities = env.transition_probabilities(s_, a)
+            for element, probability in transition_probabilities.get_values():
+                flow_parents[element.id].append(flow_variables[s_.id][a.name])
+                succession_probabilities[element.id].append(probability)
+
+                
+    # in(s) == transition-probability-weighted sum of flows of transition parents
+    for s in env.state_space:
+        if flow_parents[s.id]:
+            m.addConstr(in_vars[s.id] == flow_parents[s.id] @ np.array(succession_probabilities[s.id]))
         else:
-            m.addConstr(in_s == 0)
+            m.addConstr(in_vars[s.id] == 0)
 
-    # Enforcing conversation of flow
+    # Charlie's old version===================================
+    # # Creating, constraining and storing in(s) variables for all transient states s
+    # for s in env.state_space:
+    #     in_s = m.addVar(name=f"in_{s.id}")
+    #     if env.terminal_state(s):
+    #         in_variables_goal[s.id] = in_s
+    #     else:
+    #         in_variables_transient[s.id] = in_s        
+
+    #     ####### ST need to fix this.
+    #     # Finding all transition 'parents' of s, and temp. storing their flow variables and the transition probabilities
+    #     flow_parents = []
+    #     succession_probabilities = []
+    #     for s_ in env.state_space:
+    #         for a in env.applicable_actions(s_):
+    #             transition_probabilities = env.transition_probabilities(s_, a)
+    #             for element, probability in transition_probabilities.get_values():
+    #                 if element.id == s.id:
+    #                     succession_probabilities.append(probability)
+    #                     flow_parents.append(flow_variables[s_.id][a.name])
+
+    #     # in(s) == transition-probability-weighted sum of flows of transition parents
+    #     if flow_parents:
+    #         m.addConstr(in_s == flow_parents @ np.array(succession_probabilities))
+    #     else:
+    #         m.addConstr(in_s == 0)
+
+    # Enforcing conservation of flow
     for s in env.state_space:
         if not env.terminal_state(s):
             aggregate_flow = 0
@@ -127,6 +162,7 @@ def optimal_deterministic_policy(env: MorallyConsequentialCsspEnv):
 
     m.setObjective(obj, GRB.MINIMIZE)
     m.params.LogToConsole = 0
+    m.update()
     m.optimize()
 
     # Creating policy object to be returned (converts variable values to constants)
