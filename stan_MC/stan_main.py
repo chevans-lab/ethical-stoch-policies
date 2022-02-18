@@ -62,6 +62,7 @@ def solve_cssp(env: MorallyConsequentialCsspEnv,
         constraint_params: A string -> float mapping for parameterising the constraints we want to enforce.
             -- If "bound_wcv" is provided, it maps to the upper bound on worst-case value that should be enforced
             -- If "bound_ewd" is provided, it maps to the upper bound on difference between expected and worst-case value that should be enforced
+            -- If "bound_cvar" is provided, it maps to the upper bound on conditional value at risk that should be enforced
             -- If "tradeoff_wcv" is provided, it maps to the weighting to give to the worst-case value increase in the tradeoff constraint.
             -- If "tradeoff_cvar" is provided, it maps to the weighting to give to the conditional value at risk increase in the tradeoff constraint.
         sample_size: Batch size of deterministic policies to randomly sample at each iteration of StAn-MC.
@@ -81,7 +82,7 @@ def solve_cssp(env: MorallyConsequentialCsspEnv,
             plot_data["Worst"] = np.empty(iterations)
         if "bound_ewd" in constraint_params:
             plot_data["Expected_Worst_Diff"] = np.empty(iterations)
-        if "tradeoff_cvar" in constraint_params:
+        if "tradeoff_cvar" in constraint_params or "bound_cvar" in constraint_params:
             plot_data["CVaR"] = np.empty(iterations)
 
     # Produce initial feasible & acceptable solution
@@ -97,7 +98,7 @@ def solve_cssp(env: MorallyConsequentialCsspEnv,
             plot_data["Worst"][0] = solution.value
         if "bound_ewd" in constraint_params:
             plot_data["Expected_Worst_Diff"][0] = 0
-        if "tradeoff_cvar" in constraint_params:
+        if "tradeoff_cvar" in constraint_params or "bound_cvar" in constraint_params:
             plot_data["CVaR"][0] = solution.value
 
     for i in range(1, iterations):
@@ -124,7 +125,7 @@ def solve_cssp(env: MorallyConsequentialCsspEnv,
                 plot_data["Worst"][i] = solution.worst_case_value
             if "bound_ewd" in constraint_params:
                 plot_data["Expected_Worst_Diff"][i] = solution.worst_case_value - solution.value
-            if "tradeoff_cvar" in constraint_params:
+            if "tradeoff_cvar" in constraint_params or "bound_cvar" in constraint_params:
                 plot_data["CVaR"][i] = solution.cvar
 
     print("Ending search and returning best known feasible and acceptable policy")

@@ -28,6 +28,7 @@ def solve_rmp(env: MorallyConsequentialCsspEnv,
         constraint_params: A string -> float mapping for parameterising the constraints we want to enforce.
             -- If "bound_wcv" is provided, it maps to the upper bound on worst-case value that should be enforced
             -- If "bound_ewd" is provided, it maps to the upper bound on difference between expected and worst-case value that should be enforced
+            -- If "bound_cvar" is provided, it maps to the upper bound on the conditional value at risk
             -- If "tradeoff_wcv" is provided, it maps to the weighting to give to the worst-case value increase in the tradeoff constraint.
             -- If "tradeoff_cvar" is provided, it maps to the weighting to give to the conditional value at risk increase in the tradeoff constraint.
     Returns:
@@ -104,7 +105,7 @@ def solve_rmp(env: MorallyConsequentialCsspEnv,
             m.addConstr(worst - obj <= constraint_params["bound_ewd"])
 
     # If user has requested enforcement of the CVaR tradeoff constraint
-    if "tradeoff_cvar" in constraint_params:
+    if "tradeoff_cvar" in constraint_params or "bound_cvar" in constraint_params:
         m.params.NonConvex = 2  # configuring solver to accept bilinear constraints
 
         # The following constraints calc. Conditional value at risk of the policy distribution for confidence (1-alpha)
@@ -184,10 +185,14 @@ def solve_rmp(env: MorallyConsequentialCsspEnv,
         conditional_value_at_risk = m.addVar(name="CVaR", lb=min_cost, ub=max_cost)
         m.addConstr(conditional_value_at_risk == lmd * value_at_risk + cvar_plus - (lmd * cvar_plus))
 
-        # Trading off expected value decreases with CVaR increases
-        # Tradeoff rate given by constraint_params["tradeoff_cvar"]
-        m.addConstr(unopt_solution.value - obj >= constraint_params["tradeoff_cvar"]
-                    * (conditional_value_at_risk - unopt_solution.cvar) - tradeoff_relaxation)
+        if "tradeoff_cvar" in constraint_params:
+            # Trading off expected value decreases with CVaR increases
+            # Tradeoff rate given by constraint_params["tradeoff_cvar"]
+            m.addConstr(unopt_solution.value - obj >= constraint_params["tradeoff_cvar"]
+                        * (conditional_value_at_risk - unopt_solution.cvar) - tradeoff_relaxation)
+        else:
+            # Upper-bounding CVaR
+            m.addConstr(conditional_value_at_risk <= constraint_params["bound_cvar"])
 
     m.optimize()
 
@@ -205,7 +210,7 @@ def solve_rmp(env: MorallyConsequentialCsspEnv,
         else:
             optimised_wcv = unopt_solution.worst_case_value
         optimised_cvar: float
-        if "tradeoff_cvar" in constraint_params:
+        if "tradeoff_cvar" in constraint_params or "bound_cvar" in constraint_params:
             optimised_cvar = m.getVarByName("CVaR").x
         else:
             optimised_cvar = unopt_solution.cvar

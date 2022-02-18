@@ -70,7 +70,7 @@ def solve_and_plot(instance_name: str, constraint_params: Dict[str, float], iter
     if "bound_ewd" in constraint_params:
         df['Expected_Worst_Diff'] = ewd_data
         sns.lineplot(x='Iteration', y='Expected_Worst_Diff', data=df, label='Expected-Worst Value Difference')
-    if "tradeoff_cvar" in constraint_params:
+    if "tradeoff_cvar" in constraint_params or "bound_cvar" in constraint_params:
         df['CVaR'] = cvar_data
         sns.lineplot(x='Iteration', y='CVaR', data=df, label='Conditional Value at Risk')
     plt.xlabel("Iterations")
@@ -113,6 +113,8 @@ if __name__ == "__main__":
                         help="Configures the worst-case value to expected value tradeoff rate when solving for the policy. Defaults to no rate (constraint not enforced).")
     parser.add_argument("-tc", "--tradeoff_cvar", dest="tradeoff_cvar", metavar="CVAR_TRADEOFF_RATE",
                         help="Configures the conditional value at risk (with preconfigured alpha) to expected value tradeoff rate when solving for the policy. Defaults to no rate (constraint not enforced).")
+    parser.add_argument("-bc", "--bound_cvar", dest="bound_cvar", metavar="CVAR_BOUND",
+                        help="Upper bounds the conditional value at risk of the policy. Defaults to no bound.")
 
     parser.add_argument("-i", "--instance", dest="instance", metavar="INSTANCE",
                         help="The morally consequential C-SSP instance to be solved. Allowable values are 'medic_small' (default).")
@@ -152,6 +154,10 @@ if __name__ == "__main__":
     if tradeoff_cvar is not None:
         tradeoff_cvar = float_cast(tradeoff_cvar, "tradeoff_cvar")
         constraint_params["tradeoff_cvar"] = tradeoff_cvar
+    bound_cvar = args.bound_cvar
+    if bound_cvar is not None:
+        bound_cvar = float_cast(bound_cvar, "bound_cvar")
+        constraint_params["bound_cvar"] = bound_cvar
 
     # Parsing solver and plotting parameters
     iterations = args.iterations

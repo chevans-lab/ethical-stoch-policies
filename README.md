@@ -2,12 +2,9 @@
 
 ## Details
 
-Author: Charles Evans 
+Authors: Charles Evans, Sylvie Thiebaux (ANU)
 
-Email: u6942700@anu.edu.au
-
-Unless otherwise indicated, everything presently in this repo is my own original work, and forms my artefact contribution
-for COMP3770, Semester 2, 2021.
+Contact email: u6942700@anu.edu.au
 
 ## Contents
 
@@ -40,7 +37,7 @@ As a precursor, the following python packages may need to be installed (if they 
 
 StAn-MC can then be used to solve a C-SSP instance and have the results plotted as a lineplot of the various performance metrics over number of policy mprovement iterations. To do, run the following command from the root of the repository:
 
-`python3 mc_cssp.py [--instance INSTANCE] [--iterations ITERATIONS] [--sample_size SAMPLE_SIZE] [--repetitions REPETITIONS] [--bound_wcv WCV_BOUND] [--bound_ewd EWD_BOUND] [--tradeoff_wcv WCV_TRADEOFF_RATE] [--tradeoff_cvar CVAR_TRADEOFF_RATE]`
+`python3 mc_cssp.py [--instance INSTANCE] [--iterations ITERATIONS] [--sample_size SAMPLE_SIZE] [--repetitions REPETITIONS] [--bound_wcv WCV_BOUND] [--bound_ewd EWD_BOUND] [--bound_cvar CVAR_BOUND] [--tradeoff_wcv WCV_TRADEOFF_RATE] [--tradeoff_cvar CVAR_TRADEOFF_RATE]`
 - Algorithm/Solver Parameters:
     - `INSTANCE` is the name of the c-ssp to be solved. Currently, only `medic_small` is a valid option. Defaults to `medic_small` if parameter not specified.
     - `ITERATIONS` is the number of improvement iterations StAn-MC will attempt on its initial policy. Must be a positive `int`. Defaults to `50`.
