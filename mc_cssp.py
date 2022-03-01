@@ -63,13 +63,13 @@ def solve_and_plot(instance_name: str, constraint_params: Dict[str, float], iter
     # Plots all repetitions of the solving process at once, by plotting the mean value of the metric at each timestep as a line plot,
     # and the confidence interval of the metric at each timestep across all solves as a shaded region.
     df = pd.DataFrame({'Iteration': iteration_index, 'Expected Value': expected_value_data})
-    sns.lineplot(x='Iteration', y='Expected Value', data=df, label='Expected Value')
+    sns.lineplot(x='Iteration', y='Expected Value', data=df, label='Expected Primary Cost')
     if "tradeoff_wcv" in constraint_params or "bound_wcv" in constraint_params:
         df['Worst'] = wcv_data
-        sns.lineplot(x='Iteration', y='Worst', data=df, label='Worst-Case Value')
+        sns.lineplot(x='Iteration', y='Worst', data=df, label='Worst-Case Primary Cost')
     if "bound_ewd" in constraint_params:
         df['Expected_Worst_Diff'] = ewd_data
-        sns.lineplot(x='Iteration', y='Expected_Worst_Diff', data=df, label='Expected-Worst Value Difference')
+        sns.lineplot(x='Iteration', y='Expected_Worst_Diff', data=df, label='Expected-Worst Primary Cost Difference')
     if "tradeoff_cvar" in constraint_params or "bound_cvar" in constraint_params:
         df['CVaR'] = cvar_data
         sns.lineplot(x='Iteration', y='CVaR', data=df, label='Conditional Value at Risk')
