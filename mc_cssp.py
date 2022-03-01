@@ -75,7 +75,7 @@ def solve_and_plot(instance_name: str, constraint_params: Dict[str, float], iter
         sns.lineplot(x='Iteration', y='CVaR', data=df, label='Conditional Value at Risk')
     plt.xlabel("Iterations")
     plt.ylabel("Expected Pain after Discharge")
-    plt.title("Evolution of Expected and Disadvantaged Policy Value")
+    plt.title("Evolution of Expected Primary Cost and Acceptability Measurements")
     plt.show()
 
 
